@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/AbstractNumber.csproj"
+                "${workspaceFolder}/NumberlessNumber.csproj"
             ],
             "problemMatcher": "$tsc"
         },
@@ -17,7 +17,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/AbstractNumber.csproj"
+                "${workspaceFolder}/NumberlessNumber.csproj"
             ],
             "problemMatcher": "$tsc"
         },
@@ -28,7 +28,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/AbstractNumber.csproj"
+                "${workspaceFolder}/NumberlessNumber.csproj"
             ],
             "problemMatcher": "$tsc"
         }
