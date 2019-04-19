@@ -149,65 +149,82 @@ namespace Calculator
     class Number
     {
 
-        public static Number operator ++(Number number)
+        public static Number operator ++(Number numberToIncrement)
         {
-            return NumberLine.NumberAfter(number);
+            return numberToIncrement.Next();
         }
 
-        public static Number operator --(Number number)
+        public static Number operator --(Number numberToDecrement)
         {
-            return NumberLine.NumberBefore(number);
+            return numberToDecrement.Previous();
         }
 
-        public static bool operator >(Number number1, Number number2)
+        public static bool operator >(Number leftOperand, Number rightOperand)
         {            
-            Number currentNumber = number2;    
-            while (currentNumber != NumberLine.LastNumber())
+            bool result;
+
+            //If they're equal
+            if (leftOperand == rightOperand)
             {
-                currentNumber++; 
-                if (currentNumber == number1)
-                    return true;
+                result = false;
             }
-            return false;
+
+            //If they're different
+            else
+            {
+
+                //Simultaneously search predecessors and successors of leftOperand until rightOperand is found
+                Number successorOfLeftOperand = leftOperand;
+                Number predecessorOfLeftOperand = leftOperand;
+                do
+                {
+                    successorOfLeftOperand++;
+                    predecessorOfLeftOperand--;
+                } while (successorOfLeftOperand != rightOperand && predecessorOfLeftOperand != rightOperand);
+
+                //If number2 was predecessor --> number1 was greater
+                result = predecessorOfLeftOperand == rightOperand;
+            }            
+            return result;
         }
 
-        public static bool operator <(Number number1, Number number2)
+        public static bool operator <(Number leftOperand, Number rightOperand)
         {     
-            return number1 != number2 && !(number1 > number2);
+            return leftOperand != rightOperand && !(leftOperand > rightOperand);
         }
 
-        public static bool operator >=(Number number1, Number number2)
+        public static bool operator >=(Number leftOperand, Number rightOperand)
         {            
-            return number1 == number2 || number1 > number2;
+            return leftOperand == rightOperand || leftOperand > rightOperand;
         }
 
-        public static bool operator <=(Number number1, Number number2)
+        public static bool operator <=(Number leftOperand, Number rightOperand)
         {            
-            return number1 == number2 || number1 < number2;
+            return leftOperand == rightOperand || leftOperand < rightOperand;
         }
 
         private bool IsPositive()
         {
-            return this > NumberLine.Origin;
+            return this > Origin();
         }
 
         private bool IsNegative()
         {
-            return this < NumberLine.Origin;
+            return this < Origin();
         }
 
-        public static Number operator -(Number number)
+        public static Number operator -(Number numberToNegate)
         {
-            Number result = NumberLine.Origin;
+            Number result = Origin();
 
-            //If positive --> subtract for each
-            if (number.IsPositive())
-                for (Number i = number; i != NumberLine.Origin; i--)
+            //If positive --> decrement for each
+            if (numberToNegate.IsPositive())
+                for (Number i = numberToNegate; i != Origin(); i--)
                     result--;
 
-            //If negative --> add for each
-            else if (number.IsNegative())
-                for (Number i = number; i != NumberLine.Origin; i++)
+            //If negative --> increment for each
+            else if (numberToNegate.IsNegative())
+                for (Number i = numberToNegate; i != Origin(); i++)
                     result++;
             return result;
         }
@@ -219,12 +236,12 @@ namespace Calculator
                 : -this;
         }
 
-        public static Number operator +(Number number1, Number number2)
+        public static Number operator +(Number leftOperand, Number rightOperand)
         {
-            Number result = number1;
-            for (Number i = number2.AbsoluteValue(); i != NumberLine.Origin; i--)
+            Number result = leftOperand;
+            for (Number i = rightOperand.AbsoluteValue(); i != Origin(); i--)
             {
-                if (number2.IsPositive())
+                if (rightOperand.IsPositive())
                     result++;
                 else
                     result--;
@@ -232,57 +249,60 @@ namespace Calculator
             return result;
         }
 
-        public static Number operator -(Number number1, Number number2)
+        public static Number operator -(Number leftOperand, Number rightOperand)
         {
-            return number1 + -number2;
+            return leftOperand + -rightOperand;
         }
 
-        public static Number operator *(Number number1, Number number2)
+        public static Number operator *(Number leftOperand, Number rightOperand)
         {
-            Number result = NumberLine.Origin;
-            for(Number i = number2.AbsoluteValue(); i != NumberLine.Origin; i--)
+            Number result = Origin();
+            for(Number i = rightOperand.AbsoluteValue(); i != Origin(); i--)
             {                
-                if (number2.IsPositive())
-                    result += number1;
+                if (rightOperand.IsPositive())
+                    result += leftOperand;
                 else
-                    result -= number1;
+                    result -= leftOperand;
             }
             return result;
         }
 
-        public static Number operator /(Number number1, Number number2)
+        public static Number operator /(Number dividend, Number divisor)
         {
             //Validate
-            if (number2 == NumberLine.Origin)
+            if (divisor == Origin())
                 throw new ArgumentOutOfRangeException();
 
             //Initialize counters
-            Number result = NumberLine.Origin;
-            Number remaining = number1.AbsoluteValue();
-            Number eachSubtraction = number2.AbsoluteValue();
+            Number absoluteQuotient = Origin();
+            Number absoluteRemainder = dividend.AbsoluteValue();
+            Number absoluteDivisor = divisor.AbsoluteValue();
 
-            //Subtract as many times as possible
-            while(remaining >= eachSubtraction)
+            //Subtract divisor as many times as possible
+            while(absoluteRemainder >= absoluteDivisor)
             {
-                if ((number1.IsPositive() && number2.IsPositive())
-                        || (number1.IsNegative() && number2.IsNegative()))
-                    result++;
-                else
-                    result--;
-                remaining -= eachSubtraction;
+                absoluteQuotient++;
+                absoluteRemainder -= absoluteDivisor;
             }
-            return result;
+
+            //Return with correct sign
+            if ((dividend.IsPositive() && divisor.IsPositive())
+                    || (dividend.IsNegative() && divisor.IsNegative()))
+                return absoluteQuotient;
+            else
+                return -absoluteQuotient;
         }
 
-        public static Number operator %(Number number1, Number number2)
+        public static Number operator %(Number dividend, Number divisor)
         {
             //Get absolute remainder
-            Number quotient = number1 / number2;
-            Number absoluteRemainder = number1.AbsoluteValue() - (number2 * quotient).AbsoluteValue();
+            Number quotient = dividend / divisor;
+            Number product = divisor * quotient;
+            Number absoluteRemainder = dividend.AbsoluteValue() - product.AbsoluteValue();
 
-            //Get correct sign
-            if ((number1.IsPositive() && number2.IsPositive())
-                    || (number1.IsNegative() && number2.IsNegative()))
+            //Return with correct sign
+            if ((dividend.IsPositive() && divisor.IsPositive())
+                    || (dividend.IsNegative() && divisor.IsNegative()))
                 return absoluteRemainder;
             else
                 return -absoluteRemainder;
@@ -291,7 +311,7 @@ namespace Calculator
         public static Number Parse(string numberString)
         {
             //Start at origin
-            Number result = NumberLine.Origin;
+            Number result = Origin();
             
             //Increment for each 'O', Decrement for each 'X'
             foreach(char c in numberString.ToCharArray())
@@ -309,11 +329,11 @@ namespace Calculator
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            if (this >= NumberLine.Origin)
-                for(Number currentNumber = this; currentNumber != NumberLine.Origin; currentNumber--)
+            if (this >= Origin())
+                for(Number currentNumber = this; currentNumber != Origin(); currentNumber--)
                     sb.Append("O");
             else
-                for(Number currentNumber = this; currentNumber != NumberLine.Origin; currentNumber++)
+                for(Number currentNumber = this; currentNumber != Origin(); currentNumber++)
                     sb.Append("X");
             return sb.ToString();
         }
@@ -325,7 +345,7 @@ namespace Calculator
                 throw new ArgumentOutOfRangeException();
 
             //Calculate
-            Number result = NumberLine.Origin;
+            Number result = Origin();
             foreach(Number digit in digits)
             {
                 result += digit;
@@ -335,80 +355,56 @@ namespace Calculator
             return result;
         }
 
-        private Number() { }
+        private Number() { }    
 
-        private class NumberLine
-        {                
-
-            public static Number Origin { get 
-            { 
-                //Ensure origin exists
-                EnsureOrigin();
-
-                //Return origin
-                return _Origin; 
-            } }
-
-            public static Number NumberAfter(Number original)
-            {
-                //Ensure next number exists       
-                EnsureNext(original);
-
-                //Return next number
-                return NumberList.Find(original).Next.Value;
-            }
-
-            public static Number NumberBefore(Number original)
-            {
-                //Ensure previous number exists
-                EnsurePrevious(original);
-
-                //Return previous number
-                return NumberList.Find(original).Previous.Value;
-            }
-
-            public static Number GetFirst()
-            {
-                return NumberList.First();
-            }
-
-            public static Number LastNumber()
-            {
-                return NumberList.Last();
-            }
-
-            private static void EnsureOrigin()
-            {         
-                lock(typeof(NumberLine))
-                {       
-                    if (!NumberList.Any())
-                    {             
-                        _Origin = new Number();       
-                        NumberList.AddLast(_Origin);
-                    }
+        private Number Next()
+        {
+            //Ensure next exists    
+            lock(typeof(Number))
+            {       
+                if (_Next == null)
+                {             
+                    _Next = new Number();  
+                    _Next._Previous = this;     
                 }
             }
 
-            private static void EnsureNext(Number number)
-            { 
-                lock(typeof(NumberLine))
-                {   
-                    if (NumberList.Find(number).Next == null)
-                        NumberList.AddLast(new Number());
+            //Return next
+            return _Next; 
+        }  
+        private Number _Next;   
+
+        private Number Previous()
+        {
+            //Ensure previous exists    
+            lock(typeof(Number))
+            {       
+                if (_Previous == null)
+                {             
+                    _Previous = new Number();  
+                    _Previous._Next = this;     
                 }
             }
 
-            private static void EnsurePrevious(Number number)
-            { 
-                lock(typeof(NumberLine))
-                {   
-                    if (NumberList.Find(number).Previous == null)
-                        NumberList.AddFirst(new Number());
+            //Return previous
+            return _Previous; 
+        }  
+        private Number _Previous;
+
+        private static Number Origin() 
+        {
+            //Ensure origin exists    
+            lock(typeof(Number))
+            {       
+                if (_Origin == null)
+                {             
+                    _Origin = new Number();       
                 }
             }
-            
-            private static LinkedList<Number> NumberList { get; } = new LinkedList<Number>();
-            private static Number _Origin;
+
+            //Return origin
+            return _Origin; 
         }
+        private static Number _Origin;
     }
 }
