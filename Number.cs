@@ -8,11 +8,13 @@ namespace NumberlessNumber
 
         public static Number operator ++(Number numberToIncrement)
         {
+            //Get the next number
             return numberToIncrement.Next();
         }
 
         public static Number operator --(Number numberToDecrement)
         {
+            //Get the previous number
             return numberToDecrement.Previous();
         }
 
@@ -47,26 +49,31 @@ namespace NumberlessNumber
 
         public static bool operator <(Number leftOperand, Number rightOperand)
         {     
+            //If not greater than or equal to
             return leftOperand != rightOperand && !(leftOperand > rightOperand);
         }
 
         public static bool operator >=(Number leftOperand, Number rightOperand)
         {            
+            //If either greater than or equal to
             return leftOperand == rightOperand || leftOperand > rightOperand;
         }
 
         public static bool operator <=(Number leftOperand, Number rightOperand)
-        {            
+        {          
+            //If eithe less than or equal to
             return leftOperand == rightOperand || leftOperand < rightOperand;
         }
 
         private bool IsPositive()
         {
+            //If greater than origin
             return this > Origin();
         }
 
         private bool IsNegative()
         {
+            //If less than origin
             return this < Origin();
         }
 
@@ -74,12 +81,12 @@ namespace NumberlessNumber
         {
             Number result = Origin();
 
-            //If positive --> decrement for each
+            //If positive --> count down from origin, for each
             if (numberToNegate.IsPositive())
                 for (Number i = numberToNegate; i != Origin(); i--)
                     result--;
 
-            //If negative --> increment for each
+            //If negative --> count up from origin, for each
             else if (numberToNegate.IsNegative())
                 for (Number i = numberToNegate; i != Origin(); i++)
                     result++;
@@ -88,6 +95,7 @@ namespace NumberlessNumber
 
         private Number AbsoluteValue()
         {
+            //Invert if negative
             return IsPositive()
                 ? this
                 : -this;
@@ -95,12 +103,18 @@ namespace NumberlessNumber
 
         public static Number operator +(Number leftOperand, Number rightOperand)
         {
+
+            //Start with left operand
             Number result = leftOperand;
+
+            //If positive, increment for each right operand
             for (Number i = rightOperand.AbsoluteValue(); i != Origin(); i--)
             {
                 if (rightOperand.IsPositive())
                     result++;
                 else
+
+                    //If negative, decrement for each right operand
                     result--;
             }
             return result;
@@ -108,16 +122,21 @@ namespace NumberlessNumber
 
         public static Number operator -(Number leftOperand, Number rightOperand)
         {
+            //Add the inverse
             return leftOperand + -rightOperand;
         }
 
         public static Number operator *(Number leftOperand, Number rightOperand)
         {
             Number result = Origin();
+
+            //If positive, add the left operand for each right operand
             for(Number i = rightOperand.AbsoluteValue(); i != Origin(); i--)
             {                
                 if (rightOperand.IsPositive())
                     result += leftOperand;
+
+                //If negative, subtract the left operand for each right operand
                 else
                     result -= leftOperand;
             }
@@ -170,11 +189,13 @@ namespace NumberlessNumber
             //Start at origin
             Number result = Origin();
             
-            //Increment for each 'O', Decrement for each 'X'
+            //Increment for each 'O'
             foreach(char c in numberString.ToCharArray())
             {
                 if (c.ToString().ToUpper() == "O")
                     result++;
+
+                //Decrement for each 'X'
                 else if (c.ToString().ToUpper() == "X")
                     result--;
                 else
@@ -186,30 +207,17 @@ namespace NumberlessNumber
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
+
+            //If positive, output O for each 
             if (this >= Origin())
                 for(Number currentNumber = this; currentNumber != Origin(); currentNumber--)
                     sb.Append("O");
+
+            //If negative, output X for each
             else
                 for(Number currentNumber = this; currentNumber != Origin(); currentNumber++)
                     sb.Append("X");
             return sb.ToString();
-        }
-
-        public static Number FromDigits(Number digitBase, params Number[] digits)
-        {
-            //Validate
-            if (digitBase <= Parse("O"))
-                throw new ArgumentOutOfRangeException();
-
-            //Calculate
-            Number result = Origin();
-            foreach(Number digit in digits)
-            {
-                result += digit;
-                result *= digitBase;
-            }
-            result /= digitBase;
-            return result;
         }
 
         private Number() { }    
