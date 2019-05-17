@@ -23,11 +23,11 @@ To communicate the concept of the numbers visually (and also provide simple mean
 
 For example:
 * "XXX" (conceptually equivalent to the Indo-Arabic "-3")
-* "XX" (to "-2")
+* "XX" (equivalent to "-2")
 * "X" ("-1")
 * "" ("0")
 * "O" ("1")
 * "OO" ("2")
 * "OOO" ("3")
 
-Obviously, numbers could be represented (and operations performed) much more efficiently using a place-value representation (like decimal or binary), but that seemed too familiar to how I have been typically think of numbers, so I wanted something more "raw", and I couldn't think of anything more raw than an amount of Os.
+Obviously, numbers could be represented (and operations performed) much more efficiently using a place-value representation (like decimal or binary), but that seemed too familiar to how I typically think of numbers, so I wanted something more "raw", and I couldn't think of anything more raw than an amount of Os.
